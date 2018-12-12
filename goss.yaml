@@ -1,0 +1,82 @@
+# Kurento docker container tests configuration.
+# checks Kurento media server installed.
+package:
+
+  ### Checks Kurento packages:
+
+  # checks gStreamer v1.5 installed.
+  libgstreamer1.5-0:amd64:
+    installed: true
+    versions:
+      - 1.8.1.1.xenial~20181018130734.170.0d6031b
+
+  # check gstreamer1.5-plugins-base installed
+  gstreamer1.5-plugins-base:
+    installed: true
+    versions:
+    - 1.8.1.1.xenial~20181018132104.55.7b19cfd
+
+  # checks libnice installed.
+  gstreamer1.5-nice:
+    installed: true
+    versions:
+      - 0.1.15-1kurento2~20181207131058.gbp03e0b4
+
+  # checks gstreamer1.5-plugins-bad installed.
+  gstreamer1.5-plugins-bad:amd64:
+    installed: true
+    versions:
+      - 1.8.1.1.xenial~20181018134602.100.3db37b1
+
+  # checks gstreamer1.5-plugins-ugly installed.
+  gstreamer1.5-plugins-ugly:
+    installed: true
+    versions:
+    - 1.8.1.1.xenial~20181018140138.89.2685b0f
+
+  # checks gstreamer1.5-libav installed.
+  gstreamer1.5-libav:
+    installed: true
+    versions:
+    - 1.8.2.1.xenial~20181018140706.96.493eee4
+
+  # checks gstreamer1.5-tools installed.
+  gstreamer1.5-tools:
+    installed: true
+    versions:
+    - 1.8.1.1.xenial~20181018130734.170.0d6031b
+
+  # checks openh26 installed.
+  openh264:
+    installed: true
+    versions:
+      - 1.4.0.xenial~20181018130100.2.5faa3d1
+
+# checks port listening
+port:
+  # checks Kurento web-socket port listening.
+  tcp6:8888:
+    listening: true
+    ip:
+      - '::'
+  # checks health check HTTP endpoint port listening.
+  tcp6:9092:
+    listening: true
+    ip:
+      - '::'
+
+# checks process running.
+process:
+  # checks supervisord running.
+  supervisord:
+    running: true
+
+# checks supervisor`s children running.
+command:
+  supervisorctl:
+    exit-status: 0
+    stdout:
+      - /healthcheck\s*RUNNING/
+      - /kms\s*RUNNING/
+    stderr: []
+    timeout: 10000

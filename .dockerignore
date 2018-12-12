@@ -1,0 +1,6 @@
+*
+!entrypoint.sh
+!healthcheck.sh
+!healthcheck.yaml
+!supervisord.conf
+!rootfs/
