@@ -1,7 +1,7 @@
 Kurento media server
 ===============================
 
-[![GitHub release](https://img.shields.io/github/release/instrumentisto/kurento-media-server.svg)](https://hub.docker.com/r/instrumentisto/kurento-media-server/tags) [![Build Status](https://travis-ci.org/instrumentisto/kurento-media-server.svg?branch=master)](https://travis-ci.org/instrumentisto/kurento-media-server) [![Docker Pulls](https://img.shields.io/docker/pulls/instrumentisto/kurento-media-server.svg)](https://hub.docker.com/r/instrumentisto/kurento-media-server)
+[![GitHub release](https://img.shields.io/github/release/instrumentisto/kurento-docker-image.svg)](https://hub.docker.com/r/flexconstructor/kurento-docker-image/tags) [![Build Status](https://travis-ci.org/instrumentisto/kurento-docker-image.svg?branch=master)](https://travis-ci.org/instrumentisto/kurento-docker-image) [![Docker Pulls](https://img.shields.io/docker/pulls/flexconstructor/kurento-docker-image.svg)](https://hub.docker.com/r/flexconstructor/kurento-docker-imager)
 
 
 ## What is Kurento media server?
