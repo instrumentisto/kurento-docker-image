@@ -12,8 +12,8 @@
 
 
 IMAGE_NAME := instrumentisto/kurento-media-server
-VERSION ?= 6.8.1.0
-TAGS ?= 6.8.1.0,6.8.1,6.8,6,latest
+VERSION ?= 6.8.1-r1
+TAGS ?= 6.8.1-r1,6.8.1,6.8,6,latest
 
 
 comma := ,
@@ -89,25 +89,32 @@ release: | image tags push
 
 post-push-hook:
 	@mkdir -p hooks/
-	docker run --rm -i -v "$(PWD)/post_push.tmpl.php":/post_push.php:ro \
+	docker run --rm -v "$(PWD)/post_push.tmpl.php":/post_push.php:ro \
 		php:alpine php -f /post_push.php -- \
 			--image_tags='$(TAGS)' \
 		> hooks/post_push
 
 
 
-# Test docker image.
+# Test Docker image with goss tool.
+#
+# Manual:
+#	https://github.com/aelsabbahy/goss/blob/master/docs/manual.md#usage
 #
 # Usage:
 #	make test [VERSION=<image-version>]
 
 test:
-	docker run -d --rm -it --name kurento -v  $(PWD)/goss.yaml:/goss/goss.yaml\
+	-@docker stop kurento-test
+	-@docker rm kurento-test
+	docker run -d --rm --name=kurento \
+	           -v "$(PWD)/goss.yaml":/goss/goss.yaml \
 		$(IMAGE_NAME):$(VERSION)
 	sleep 20
-	docker exec  kurento /usr/local/bin/goss --gossfile /goss/goss.yaml validate --format tap
+	docker exec kurento-test \
+		/usr/local/bin/goss --gossfile=/goss/goss.yaml validate --format=tap
 	docker stop kurento
 
 
 
-.PHONY: image tags push release post-push-hook
+.PHONY: image tags push release post-push-hook test
