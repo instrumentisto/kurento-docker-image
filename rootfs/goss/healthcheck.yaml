@@ -1,17 +1,20 @@
-# Kurento health check configuration.
-# checks Kurento web-socket port listening.
+# Kurento health-check configuration.
+
+# Check Kurento port listening
 port:
+  # Listens on WebSocket port
   tcp6:8888:
     listening: true
     ip:
-    - '::'
+      - '::'
 
-# checks supervisor process running.
+# Check processes running
 process:
+  # supervisord runs
   supervisord:
     running: true
 
-# checks Kurento media server process running.
+# Check supervisor's children running
 command:
   supervisorctl:
     exit-status: 0
