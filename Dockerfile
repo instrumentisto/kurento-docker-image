@@ -239,11 +239,9 @@ RUN apt-get install -y --reinstall ca-certificates \
  && (curl -fsSL https://goss.rocks/install | sh) \
  # Cleanup stuff
  && apt-get clean \
- && rm -rf /var/lib/apt/lists/* \
+ && rm -rf /var/lib/apt/lists/*
 
 EXPOSE 8888
-
-VOLUME ["/var/log/supervisor"]
 
 WORKDIR /kurento-media-server
 

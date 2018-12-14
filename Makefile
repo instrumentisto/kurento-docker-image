@@ -104,16 +104,18 @@ post-push-hook:
 # Usage:
 #	make test [VERSION=<image-version>]
 
+test-container-name ?= kurento-test
+
 test:
-	-@docker stop kurento-test
-	-@docker rm kurento-test
-	docker run -d --rm --name=kurento-test \
+	-@docker stop $(test-container-name) \
+	-@docker rm $(test-container-name)
+	docker run -d --rm --name=$(test-container-name) \
 	           -v "$(PWD)/goss.yaml":/goss/goss.yaml \
 		$(IMAGE_NAME):$(VERSION)
 	sleep 20
-	docker exec kurento-test \
+	docker exec $(test-container-name) \
 		/usr/local/bin/goss --gossfile=/goss/goss.yaml validate --format=tap
-	docker stop kurento-test
+	@docker stop $(test-container-name)
 
 
 
