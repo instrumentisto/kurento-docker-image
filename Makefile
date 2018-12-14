@@ -113,7 +113,7 @@ test:
 	sleep 20
 	docker exec kurento-test \
 		/usr/local/bin/goss --gossfile=/goss/goss.yaml validate --format=tap
-	docker stop kurento
+	docker stop kurento-test
 
 
 
