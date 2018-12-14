@@ -102,8 +102,8 @@ RUN apt-get install -y --no-install-recommends \
             libglibmm-2.4-dev
 
 # Download Kurento media server project sources
-RUN git clone https://github.com/Kurento/kms-omni-build.git kms/ \
- && cd /kms/ \
+RUN git clone https://github.com/Kurento/kms-omni-build.git \
+ && cd /kms-omni-build/ \
  && git checkout 722df59b98dcdeda12151ee2d3a32c847e3fee62 \
  && git config -f .gitmodules \
     submodule.kms-cmake-utils.commit b931efc0f5f095698956ba29f85b4aa1d784e3e0 \
@@ -124,8 +124,8 @@ RUN git clone https://github.com/Kurento/kms-omni-build.git kms/ \
  && cat .gitmodules
 
 # Build Kurento media server project
-RUN mkdir -p /kms/build/ \
- && cd /kms/build/ \
+RUN mkdir -p /kms-omni-build/build/ \
+ && cd /kms-omni-build/build/ \
  && cmake -DCMAKE_BUILD_TYPE=$TYPE \
           -DENABLE_ANALYZER_ASAN=ON \
           -DSANITIZE_ADDRESS=ON \
@@ -139,55 +139,55 @@ RUN mkdir -p /dist/kurento-media-server/server/config/kurento/ \
  && mkdir -p /dist/kurento-media-server/plugins/ \
  && mkdir -p /dist/usr/local/lib/ \
  # Copy kurento-media-server binary
- && cp /kms/build/kurento-media-server/server/kurento-media-server \
+ && cp /kms-omni-build/build/kurento-media-server/server/kurento-media-server \
        /dist/kurento-media-server/server/kurento-media-server \
  # Copy Kurento config
- && cp /kms/kurento-media-server/kurento.conf.json \
+ && cp /kms-omni-build/kurento-media-server/kurento.conf.json \
        /dist/kurento-media-server/server/config/kurento.conf.json \
  # Copy additional configuration files
- && cp /kms/kms-core/src/server/config/BaseRtpEndpoint.conf.ini \
+ && cp /kms-omni-build/kms-core/src/server/config/BaseRtpEndpoint.conf.ini \
        /dist/kurento-media-server/server/config/kurento/BaseRtpEndpoint.conf.ini \
- && cp /kms/kms-elements/src/server/config/HttpEndpoint.conf.ini \
+ && cp /kms-omni-build/kms-elements/src/server/config/HttpEndpoint.conf.ini \
        /dist/kurento-media-server/server/config/kurento/HttpEndpoint.conf.ini \
- && cp /kms/kms-core/src/server/config/MediaElement.conf.ini \
+ && cp /kms-omni-build/kms-core/src/server/config/MediaElement.conf.ini \
        /dist/kurento-media-server/server/config/kurento/MediaElement.conf.ini \
- && cp /kms/kms-core/src/server/config/SdpEndpoint.conf.json \
+ && cp /kms-omni-build/kms-core/src/server/config/SdpEndpoint.conf.json \
        /dist/kurento-media-server/server/config/kurento/SdpEndpoint.conf.json \
- && cp /kms/kms-elements/src/server/config/WebRtcEndpoint.conf.ini \
+ && cp /kms-omni-build/kms-elements/src/server/config/WebRtcEndpoint.conf.ini \
        /dist/kurento-media-server/server/config/kurento/WebRtcEndpoint.conf.ini \
  # Copy plugins
- && cp /kms/build/kms-elements/src/server/libkmselementsmodule.so \
+ && cp /kms-omni-build/build/kms-elements/src/server/libkmselementsmodule.so \
        /dist/kurento-media-server/plugins/libkmselementsmodule.so \
- && cp /kms/build/kms-core/src/gst-plugins/libkmscoreplugins.so \
+ && cp /kms-omni-build/build/kms-core/src/gst-plugins/libkmscoreplugins.so \
        /dist/kurento-media-server/plugins/libkmscoreplugins.so \
- && cp /kms/build/kms-filters/src/server/libkmsfiltersmodule.so \
+ && cp /kms-omni-build/build/kms-filters/src/server/libkmsfiltersmodule.so \
        /dist/kurento-media-server/plugins/libkmsfiltersmodule.so \
- && cp /kms/build/kms-elements/src/gst-plugins/rtcpdemux/librtcpdemux.so \
+ && cp /kms-omni-build/build/kms-elements/src/gst-plugins/rtcpdemux/librtcpdemux.so \
        /dist/kurento-media-server/plugins/librtcpdemux.so \
- && cp /kms/build/kms-elements/src/gst-plugins/webrtcendpoint/libwebrtcendpoint.so \
+ && cp /kms-omni-build/build/kms-elements/src/gst-plugins/webrtcendpoint/libwebrtcendpoint.so \
        /dist/kurento-media-server/plugins/libwebrtcendpoint.so \
- && cp /kms/build/kms-core/src/gst-plugins/libkmscoreplugins.so \
+ && cp /kms-omni-build/build/kms-core/src/gst-plugins/libkmscoreplugins.so \
        /dist/kurento-media-server/plugins/libkmscoreplugins.so \
- && cp /kms/build/kms-core/src/server/libkmscoremodule.so \
+ && cp /kms-omni-build/build/kms-core/src/server/libkmscoremodule.so \
        /dist/kurento-media-server/plugins/libkmscoremodule.so \
- && cp /kms/build/kms-core/src/gst-plugins/vp8parse/libvp8parse.so \
+ && cp /kms-omni-build/build/kms-core/src/gst-plugins/vp8parse/libvp8parse.so \
        /dist/kurento-media-server/plugins/libvp8parse.so \
  # Copy shared libs
- && cp /kms/build/kms-core/src/server/libkmscoreimpl.so \
+ && cp /kms-omni-build/build/kms-core/src/server/libkmscoreimpl.so \
        /dist/usr/local/lib/libkmscoreimpl.so.6 \
- && cp /kms/build/kms-jsonrpc/src/libjsonrpc.so \
+ && cp /kms-omni-build/build/kms-jsonrpc/src/libjsonrpc.so \
        /dist/usr/local/lib/libjsonrpc.so.6 \
- && cp /kms/build/kms-core/src/gst-plugins/commons/libkmsgstcommons.so \
+ && cp /kms-omni-build/build/kms-core/src/gst-plugins/commons/libkmsgstcommons.so \
        /dist/usr/local/lib/libkmsgstcommons.so.6 \
- && cp /kms/build/kms-core/src/gst-plugins/commons/sdpagent/libkmssdpagent.so \
+ && cp /kms-omni-build/build/kms-core/src/gst-plugins/commons/sdpagent/libkmssdpagent.so \
        /dist/usr/local/lib/libkmssdpagent.so.6 \
- && cp /kms/build/kms-filters/src/server/libkmsfiltersimpl.so \
+ && cp /kms-omni-build/build/kms-filters/src/server/libkmsfiltersimpl.so \
        /dist/usr/local/lib/libkmsfiltersimpl.so.6 \
- && cp /kms/build/kms-elements/src/server/libkmselementsimpl.so \
+ && cp /kms-omni-build/build/kms-elements/src/server/libkmselementsimpl.so \
        /dist/usr/local/lib/libkmselementsimpl.so.6 \
- && cp /kms/build/kms-elements/src/gst-plugins/webrtcendpoint/libkmswebrtcendpointlib.so \
+ && cp /kms-omni-build/build/kms-elements/src/gst-plugins/webrtcendpoint/libkmswebrtcendpointlib.so \
        /dist/usr/local/lib/libkmswebrtcendpointlib.so.6 \
- && cp /kms/build/kms-elements/src/gst-plugins/webrtcendpoint/libwebrtcdataproto.so \
+ && cp /kms-omni-build/build/kms-elements/src/gst-plugins/webrtcendpoint/libwebrtcdataproto.so \
        /dist/usr/local/lib/libwebrtcdataproto.so.6
 
 

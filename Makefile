@@ -107,7 +107,7 @@ post-push-hook:
 test:
 	-@docker stop kurento-test
 	-@docker rm kurento-test
-	docker run -d --rm --name=kurento \
+	docker run -d --rm --name=kurento-test \
 	           -v "$(PWD)/goss.yaml":/goss/goss.yaml \
 		$(IMAGE_NAME):$(VERSION)
 	sleep 20
