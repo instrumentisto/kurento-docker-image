@@ -21,3 +21,9 @@ command:
     stdout: [/kms\s*RUNNING/]
     stderr: []
     timeout: 10000
+  netstat -an | grep 8888 | grep ESTABLISHED | wc -l:
+    exit-status: 0
+    stdout:
+      - "/[^0]+/"
+    stderr: []
+    timeout: 10000

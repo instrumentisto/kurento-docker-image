@@ -209,6 +209,7 @@ RUN apt-get install -y --reinstall ca-certificates \
  && apt-get install -y --no-install-recommends \
             supervisor \
             curl \
+            net-tools \
             kmsjsoncpp \
             libboost-log1.58.0 \
             libboost-program-options1.58.0 \
