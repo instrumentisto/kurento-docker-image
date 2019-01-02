@@ -12,13 +12,26 @@
 
 
 IMAGE_NAME := instrumentisto/kurento-media-server
-VERSION ?= 6.8.1-r1
-TAGS ?= 6.8.1-r1,6.8.1,6.8,6,latest
+VERSION ?= 6.8.1-r2
+TAGS ?= 6.8.1-r2,6.8.1,6.8,6,latest
 
 
 comma := ,
 eq = $(if $(or $(1),$(2)),$(and $(findstring $(1),$(2)),\
                                 $(findstring $(2),$(1))),1)
+
+
+MAINLINE_BRANCH := master
+CURRENT_BRANCH := $(shell git branch | grep \* | cut -d ' ' -f2)
+
+
+
+
+###########
+# Aliases #
+###########
+
+squash: git.squash
 
 
 
@@ -116,6 +129,36 @@ test:
 	docker exec $(test-container-name) \
 		/usr/local/bin/goss --gossfile=/goss/goss.yaml validate --format=tap
 	@docker stop $(test-container-name)
+
+
+################
+# Git commands #
+################
+
+# Squash changes of the current Git branch onto another Git branch.
+#
+# WARNING: You must merge `onto` branch in the current branch before squash!
+#
+# Usage:
+#	make git.squash [onto=(<mainline-git-branch>|<git-branch>)]
+#	                [del=(no|yes)]
+#	                [upstream=(origin|<git-remote>)]
+
+onto ?= $(MAINLINE_BRANCH)
+upstream ?= origin
+
+git.squash:
+ifeq ($(CURRENT_BRANCH),$(onto))
+	echo "--> Current branch is '$(onto)' already" && false
+endif
+	git checkout $(onto)
+	git branch -m $(CURRENT_BRANCH) orig-$(CURRENT_BRANCH)
+	git checkout -b $(CURRENT_BRANCH)
+	git branch --set-upstream-to $(upstream)/$(CURRENT_BRANCH)
+	git merge --squash orig-$(CURRENT_BRANCH)
+ifeq ($(del),yes)
+	git branch -d orig-$(CURRENT_BRANCH)
+endif
 
 
 
