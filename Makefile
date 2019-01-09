@@ -12,8 +12,8 @@
 
 
 IMAGE_NAME := instrumentisto/kurento-media-server
-VERSION ?= 6.8.1-r2
-TAGS ?= 6.8.1-r2,6.8.1,6.8,6,latest
+VERSION ?= 6.9.0-r3
+TAGS ?= 6.9.1-r3,6.9.0,6.9,6,latest
 
 
 comma := ,

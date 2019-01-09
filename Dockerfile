@@ -9,30 +9,6 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 5AFA7A83 \
             wget \
             bzip2
 
-
-# Build libnice fork from https://github.com/alexlapa/libnice
-FROM base AS libnice
-
-RUN apt-get install -y --no-install-recommends \
-            build-essential \
-            cmake \
-            autotools-dev \
-            dh-autoreconf \
-            cdbs \
-            libglib2.0-dev \
-            libgnutls-dev \
-            gtk-doc-tools \
- # Install custom libnice
- && wget -O libnice.tar.gz \
-         https://github.com/alexlapa/libnice/archive/master.tar.gz \
- && tar -xvzf libnice.tar.gz \
- && cd libnice-master \
- && ./autogen.sh \
- && ./configure --libdir=/usr/lib/x86_64-linux-gnu/libnice/ \
- && make -j8 \
- && make install
-
-
 # Install GStreamer with plugins
 FROM base AS gstreamer
 
@@ -47,10 +23,6 @@ RUN apt-get install -y --no-install-recommends \
             gstreamer1.5-x \
             openh264-gst-plugins-bad-1.5 \
             openwebrtc-gst-plugins
-
-# Update libnice
-COPY --from=libnice /usr/lib/x86_64-linux-gnu/libnice/ \
-                    /usr/lib/x86_64-linux-gnu/
 
 RUN ldconfig -n /usr/lib/x86_64-linux-gnu
 
@@ -102,9 +74,9 @@ RUN apt-get install -y --no-install-recommends \
             libglibmm-2.4-dev
 
 # Download Kurento media server project sources
-RUN git clone https://github.com/Kurento/kms-omni-build.git /.kms \
+RUN git clone https://github.com/instrumentisto/kms-omni-build.git /.kms \
  && cd /.kms/ \
- && git checkout 722df59b98dcdeda12151ee2d3a32c847e3fee62 \
+ && git checkout dev \
  && git config -f .gitmodules \
     submodule.kms-cmake-utils.commit b931efc0f5f095698956ba29f85b4aa1d784e3e0 \
  && git config -f .gitmodules \
@@ -114,7 +86,7 @@ RUN git clone https://github.com/Kurento/kms-omni-build.git /.kms \
  && git config -f .gitmodules \
     submodule.kurento-module-creator.commit 9683681dcb1bad8c5cc5d42ea313973f5857115d \
  && git config -f .gitmodules \
-    submodule.kms-elements.commit 85071d7acf47a2a87e1fa772acad2f686b7a14b4 \
+    submodule.kms-elements.commit dev \
  && git config -f .gitmodules \
     submodule.kms-filters.commit cd1bab9e52864fc27a704f81dcf6ae9165ec0c78 \
  && git config -f .gitmodules \
