@@ -124,6 +124,9 @@ test:
 	-@docker rm $(test-container-name)
 	docker run -d --rm --name=$(test-container-name) \
 	           -v "$(PWD)/goss.yaml":/goss/goss.yaml \
+	           -e KMS_TURN_URL=test_turn_url \
+	           -e KMS_STUN_IP=test_stun_ip \
+	           -e KMS_STUN_PORT=1234 \
 		$(IMAGE_NAME):$(VERSION)
 	sleep 20
 	docker exec $(test-container-name) \
