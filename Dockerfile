@@ -9,30 +9,6 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 5AFA7A83 \
             wget \
             bzip2
 
-
-# Build libnice fork from https://github.com/alexlapa/libnice
-FROM base AS libnice
-
-RUN apt-get install -y --no-install-recommends \
-            build-essential \
-            cmake \
-            autotools-dev \
-            dh-autoreconf \
-            cdbs \
-            libglib2.0-dev \
-            libgnutls-dev \
-            gtk-doc-tools \
- # Install custom libnice
- && wget -O libnice.tar.gz \
-         https://github.com/alexlapa/libnice/archive/master.tar.gz \
- && tar -xvzf libnice.tar.gz \
- && cd libnice-master \
- && ./autogen.sh \
- && ./configure --libdir=/usr/lib/x86_64-linux-gnu/libnice/ \
- && make -j8 \
- && make install
-
-
 # Install GStreamer with plugins
 FROM base AS gstreamer
 
@@ -48,17 +24,13 @@ RUN apt-get install -y --no-install-recommends \
             openh264-gst-plugins-bad-1.5 \
             openwebrtc-gst-plugins
 
-# Update libnice
-COPY --from=libnice /usr/lib/x86_64-linux-gnu/libnice/ \
-                    /usr/lib/x86_64-linux-gnu/
-
 RUN ldconfig -n /usr/lib/x86_64-linux-gnu
 
 
 # Build Kurento media server
 FROM gstreamer AS dist
 
-# CMake accepts the following build types: Debug, Release, RelWithDebInfo. 
+# CMake accepts the following build types: Debug, Release, RelWithDebInfo.
 # So, for a debug build, you would run TYPE=Debug instead of TYPE=Release.
 ARG TYPE=Release
 
@@ -105,23 +77,39 @@ RUN apt-get install -y --no-install-recommends \
 RUN git clone https://github.com/Kurento/kms-omni-build.git /.kms \
  && cd /.kms/ \
  && git checkout 722df59b98dcdeda12151ee2d3a32c847e3fee62 \
- && git config -f .gitmodules \
-    submodule.kms-cmake-utils.commit b931efc0f5f095698956ba29f85b4aa1d784e3e0 \
- && git config -f .gitmodules \
-    submodule.kms-jsonrpc.commit 70a71812f21d5cd0cc9d4fb36c19ae48ca2f05bd \
- && git config -f .gitmodules \
-    submodule.kms-core.commit fe35efe08815926dbe511b1063cf7dbb2b91563e \
- && git config -f .gitmodules \
-    submodule.kurento-module-creator.commit 9683681dcb1bad8c5cc5d42ea313973f5857115d \
- && git config -f .gitmodules \
-    submodule.kms-elements.commit 85071d7acf47a2a87e1fa772acad2f686b7a14b4 \
- && git config -f .gitmodules \
-    submodule.kms-filters.commit cd1bab9e52864fc27a704f81dcf6ae9165ec0c78 \
- && git config -f .gitmodules \
-    submodule.kurento-media-server.commit d7c98feb60938c8b4da952363fd98da2f1f1b869 \
+ ## kms-elements fork
+ && git config -f .gitmodules submodule.kms-elements.url https://github.com/instrumentisto/kms-elements.git \
+ && git config -f .gitmodules submodule.kms-elements.branch dev \
+ ## init
  && git submodule update --init --recursive \
- && git submodule update --remote \
- && cat .gitmodules
+ ## kms-cmake-utils
+ && cd kms-cmake-utils \
+ && git checkout b931efc0f5f095698956ba29f85b4aa1d784e3e0 \
+ && cd .. \
+ ## kms-jsonrpc
+ && cd kms-jsonrpc \
+ && git checkout 70a71812f21d5cd0cc9d4fb36c19ae48ca2f05bd \
+ && cd .. \
+ ## kms-core
+ && cd kms-core \
+ && git checkout fe35efe08815926dbe511b1063cf7dbb2b91563e \
+ && cd .. \
+ ## kurento-module-creator
+ && cd kurento-module-creator \
+ && git checkout 9683681dcb1bad8c5cc5d42ea313973f5857115d \
+ && cd .. \
+ ## kms-elements
+ && cd kms-elements \
+ && git checkout 49b7fb5f600fb1a600c738cbd99a630e66b76fdf \
+ && cd .. \
+ ## kms-filters
+ && cd kms-filters \
+ && git checkout cd1bab9e52864fc27a704f81dcf6ae9165ec0c78 \
+ && cd .. \
+ ## kurento-media-server
+ && cd kurento-media-server \
+ && git checkout d7c98feb60938c8b4da952363fd98da2f1f1b869 \
+ && cd ..
 
 # Build Kurento media server project
 RUN mkdir -p /.kms/build/ \
@@ -132,7 +120,7 @@ RUN mkdir -p /.kms/build/ \
           -DSANITIZE_THREAD=ON \
           -DSANITIZE_LINK_STATIC=ON \
         .. \
- && make
+ && make -j4
 
 # Prepare Kurento media server project installation
 RUN mkdir -p /dist/kurento-media-server/server/config/kurento/ \
