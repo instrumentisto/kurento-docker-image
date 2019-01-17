@@ -4,14 +4,19 @@ set -e
 
 if [ -n "$KMS_TURN_URL" ]; then
   echo "turnURL=$KMS_TURN_URL" \
-    > /kurento-media-server/server/config/WebRtcEndpoint.conf.ini
+    >> /kurento-media-server/server/config/kurento/WebRtcEndpoint.conf.ini
 fi
 
 if [ -n "$KMS_STUN_IP" -a -n "$KMS_STUN_PORT" ]; then
   echo "stunServerAddress=$KMS_STUN_IP" \
-    > /kurento-media-server/server/config/WebRtcEndpoint.conf.ini
+    >> /kurento-media-server/server/config/kurento/WebRtcEndpoint.conf.ini
   echo "stunServerPort=$KMS_STUN_PORT" \
-    >> /kurento-media-server/server/config/WebRtcEndpoint.conf.ini
+    >> /kurento-media-server/server/config/kurento/WebRtcEndpoint.conf.ini
+fi
+
+if [ -n "$KMS_EXTERNAL_IPS"  ]; then
+  echo "externalIPs=$KMS_EXTERNAL_IPS" \
+    >> /kurento-media-server/server/config/kurento/WebRtcEndpoint.conf.ini
 fi
 
 # Remove IPv6 local loop until IPv6 is supported
