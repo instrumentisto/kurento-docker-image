@@ -74,3 +74,14 @@ command:
       - /kms\s*RUNNING/
     stderr: []
     timeout: 10000
+
+file:
+  /kurento-media-server/server/config/kurento/WebRtcEndpoint.conf.ini:
+    exists: true
+    filetype: file
+    mode: "0644"
+    contains:
+      - "turnURL=test_turn_url"
+      - "stunServerAddress=test_stun_ip"
+      - "stunServerPort=1234"
+      - "externalIPs=test_external_ips"

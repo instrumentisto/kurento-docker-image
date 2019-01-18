@@ -45,7 +45,10 @@ image:
 		$(if $(call eq,$(no-cache),yes),--no-cache --pull,) \
 		-t $(IMAGE_NAME):$(VERSION) .
 
-
+debug.image:
+	docker build --network=host --force-rm  --target=build\
+    		$(if $(call eq,$(no-cache),yes),--no-cache --pull,) \
+    		-t $(IMAGE_NAME):$(VERSION) .
 
 # Tag Docker image with given tags.
 #
@@ -124,6 +127,10 @@ test:
 	-@docker rm $(test-container-name)
 	docker run -d --rm --name=$(test-container-name) \
 	           -v "$(PWD)/goss.yaml":/goss/goss.yaml \
+	           -e KMS_TURN_URL=test_turn_url \
+	           -e KMS_STUN_IP=test_stun_ip \
+	           -e KMS_STUN_PORT=1234 \
+	           -e KMS_EXTERNAL_IPS=test_external_ips \
 		$(IMAGE_NAME):$(VERSION)
 	sleep 20
 	docker exec $(test-container-name) \

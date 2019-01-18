@@ -9,7 +9,6 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 5AFA7A83 \
             wget \
             bzip2
 
-# Install GStreamer with plugins
 FROM base AS gstreamer
 
 RUN apt-get install -y --no-install-recommends \
@@ -24,79 +23,20 @@ RUN apt-get install -y --no-install-recommends \
             openh264-gst-plugins-bad-1.5 \
             openwebrtc-gst-plugins
 
-RUN ldconfig -n /usr/lib/x86_64-linux-gnu
 
+FROM flexconstructor/kms-builder:latest  AS build
 
-# Build Kurento media server
-FROM gstreamer AS dist
-
-# CMake accepts the following build types: Debug, Release, RelWithDebInfo. 
-# So, for a debug build, you would run TYPE=Debug instead of TYPE=Release.
-ARG TYPE=Release
-
-RUN apt-get install -y --no-install-recommends \
-            build-essential \
-            cmake \
-            software-properties-common \
-            autotools-dev \
-            dh-autoreconf \
-            debhelper \
-            default-jdk \
-            gdb \
-            gcc \
-            git openssh-client \
-            maven \
-            pkg-config \
-            maven-debian-helper- \
-            # System development libraries
-            libboost-dev \
-            libboost-filesystem-dev \
-            libboost-regex-dev \
-            libboost-system-dev \
-            libboost-test-dev \
-            libboost-thread-dev \
-            libevent-dev \
-            libglibmm-2.4-dev \
-            libopencv-dev \
-            libsigc++-2.0-dev \
-            libsoup2.4-dev \
-            libssl-dev \
-            libvpx-dev \
-            libxml2-utils \
-            uuid-dev \
-            libgstreamer1.5-dev \
-            libgstreamer-plugins-base1.5-dev \
-            openwebrtc-gst-plugins-dev \
-            libnice-dev \
-            kmsjsoncpp-dev \
-            libboost-log-dev \
-            libboost-program-options-dev \
-            libglibmm-2.4-dev
+ENV OMNY_BUILD_VERSION=dev
+ENV KURENTO_VERSION=6.9.0
+ENV PYTHONUNBUFFERED=1
 
 # Download Kurento media server project sources
 RUN git clone https://github.com/instrumentisto/kms-omni-build.git /.kms \
  && cd /.kms/ \
- && git checkout dev \
- && git config -f .gitmodules \
-    submodule.kms-cmake-utils.commit b931efc0f5f095698956ba29f85b4aa1d784e3e0 \
- && git config -f .gitmodules \
-    submodule.kms-jsonrpc.commit 70a71812f21d5cd0cc9d4fb36c19ae48ca2f05bd \
- && git config -f .gitmodules \
-    submodule.kms-core.commit fe35efe08815926dbe511b1063cf7dbb2b91563e \
- && git config -f .gitmodules \
-    submodule.kurento-module-creator.commit 9683681dcb1bad8c5cc5d42ea313973f5857115d \
- && git config -f .gitmodules \
-    submodule.kms-elements.commit dev \
- && git config -f .gitmodules \
-    submodule.kms-filters.commit cd1bab9e52864fc27a704f81dcf6ae9165ec0c78 \
- && git config -f .gitmodules \
-    submodule.kurento-media-server.commit d7c98feb60938c8b4da952363fd98da2f1f1b869 \
+ && git checkout $OMNY_BUILD_VERSION \
+ ## init
  && git submodule update --init --recursive \
- && git submodule update --remote \
- && cat .gitmodules
-
-# Build Kurento media server project
-RUN mkdir -p /.kms/build/ \
+ && mkdir -p /.kms/build/ \
  && cd /.kms/build/ \
  && cmake -DCMAKE_BUILD_TYPE=$TYPE \
           -DENABLE_ANALYZER_ASAN=ON \
@@ -104,10 +44,10 @@ RUN mkdir -p /.kms/build/ \
           -DSANITIZE_THREAD=ON \
           -DSANITIZE_LINK_STATIC=ON \
         .. \
- && make
+ && make  \
 
-# Prepare Kurento media server project installation
-RUN mkdir -p /dist/kurento-media-server/server/config/kurento/ \
+ # Prepare Kurento media server project installation
+ && mkdir -p /dist/kurento-media-server/server/config/kurento/ \
  && mkdir -p /dist/kurento-media-server/plugins/ \
  && mkdir -p /dist/usr/local/lib/ \
  # Copy kurento-media-server binary
@@ -163,7 +103,6 @@ RUN mkdir -p /dist/kurento-media-server/server/config/kurento/ \
        /dist/usr/local/lib/libwebrtcdataproto.so.6
 
 
-# Result image
 FROM gstreamer AS kurento
 
 # Use default suggested logging levels:
@@ -172,7 +111,7 @@ ENV GST_DEBUG="3,Kurento*:3,kms*:3,sdp*:3,webrtc*:4,*rtpendpoint:4,rtp*handler:4
     # Disable colors in debug logs
     GST_DEBUG_NO_COLOR=1
 
-COPY --from=dist /dist /
+COPY --from=build /dist /
 
 COPY rootfs /
 
