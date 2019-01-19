@@ -79,7 +79,7 @@ RUN git clone https://github.com/Kurento/kms-omni-build.git /.kms \
  && git checkout 722df59b98dcdeda12151ee2d3a32c847e3fee62 \
  ## kms-elements fork
  && git config -f .gitmodules submodule.kms-elements.url https://github.com/instrumentisto/kms-elements.git \
- && git config -f .gitmodules submodule.kms-elements.branch dev \
+ && git config -f .gitmodules submodule.kms-elements.branch master \
  ## init
  && git submodule update --init --recursive \
  ## kms-cmake-utils
@@ -100,7 +100,7 @@ RUN git clone https://github.com/Kurento/kms-omni-build.git /.kms \
  && cd .. \
  ## kms-elements
  && cd kms-elements \
- && git checkout 49b7fb5f600fb1a600c738cbd99a630e66b76fdf \
+ && git checkout 6b4ad504c624c9f8c5714509ffe377ed5622a639 \
  && cd .. \
  ## kms-filters
  && cd kms-filters \
