@@ -24,55 +24,10 @@ RUN apt-get install -y --no-install-recommends \
             openh264-gst-plugins-bad-1.5 \
             openwebrtc-gst-plugins
 
-RUN ldconfig -n /usr/lib/x86_64-linux-gnu
 
+FROM flexconstructor/kms-builder:latest  AS build
 
-# Build Kurento media server
-FROM gstreamer AS dist
-
-# CMake accepts the following build types: Debug, Release, RelWithDebInfo.
-# So, for a debug build, you would run TYPE=Debug instead of TYPE=Release.
-ARG TYPE=Release
-
-RUN apt-get install -y --no-install-recommends \
-            build-essential \
-            cmake \
-            software-properties-common \
-            autotools-dev \
-            dh-autoreconf \
-            debhelper \
-            default-jdk \
-            gdb \
-            gcc \
-            git openssh-client \
-            maven \
-            pkg-config \
-            maven-debian-helper- \
-            # System development libraries
-            libboost-dev \
-            libboost-filesystem-dev \
-            libboost-regex-dev \
-            libboost-system-dev \
-            libboost-test-dev \
-            libboost-thread-dev \
-            libevent-dev \
-            libglibmm-2.4-dev \
-            libopencv-dev \
-            libsigc++-2.0-dev \
-            libsoup2.4-dev \
-            libssl-dev \
-            libvpx-dev \
-            libxml2-utils \
-            uuid-dev \
-            libgstreamer1.5-dev \
-            libgstreamer-plugins-base1.5-dev \
-            openwebrtc-gst-plugins-dev \
-            libnice-dev \
-            kmsjsoncpp-dev \
-            libboost-log-dev \
-            libboost-program-options-dev \
-            libglibmm-2.4-dev
-
+# Download Kurento media server project sources
 # Download Kurento media server project sources
 RUN git clone https://github.com/Kurento/kms-omni-build.git /.kms \
  && cd /.kms/ \
@@ -109,10 +64,8 @@ RUN git clone https://github.com/Kurento/kms-omni-build.git /.kms \
  ## kurento-media-server
  && cd kurento-media-server \
  && git checkout d7c98feb60938c8b4da952363fd98da2f1f1b869 \
- && cd ..
-
-# Build Kurento media server project
-RUN mkdir -p /.kms/build/ \
+ && cd .. \
+ && mkdir -p /.kms/build/ \
  && cd /.kms/build/ \
  && cmake -DCMAKE_BUILD_TYPE=$TYPE \
           -DENABLE_ANALYZER_ASAN=ON \
@@ -120,10 +73,10 @@ RUN mkdir -p /.kms/build/ \
           -DSANITIZE_THREAD=ON \
           -DSANITIZE_LINK_STATIC=ON \
         .. \
- && make -j4
+ && make  \
 
-# Prepare Kurento media server project installation
-RUN mkdir -p /dist/kurento-media-server/server/config/kurento/ \
+ # Prepare Kurento media server project installation
+ && mkdir -p /dist/kurento-media-server/server/config/kurento/ \
  && mkdir -p /dist/kurento-media-server/plugins/ \
  && mkdir -p /dist/usr/local/lib/ \
  # Copy kurento-media-server binary
@@ -188,7 +141,7 @@ ENV GST_DEBUG="3,Kurento*:3,kms*:3,sdp*:3,webrtc*:4,*rtpendpoint:4,rtp*handler:4
     # Disable colors in debug logs
     GST_DEBUG_NO_COLOR=1
 
-COPY --from=dist /dist /
+COPY --from=build /dist /
 
 COPY rootfs /
 

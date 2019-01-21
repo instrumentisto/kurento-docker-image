@@ -84,3 +84,4 @@ file:
       - "turnURL=test_turn_url"
       - "stunServerAddress=test_stun_ip"
       - "stunServerPort=1234"
+      - "externalIPs=test_external_ips"

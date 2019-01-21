@@ -12,8 +12,8 @@
 
 
 IMAGE_NAME := instrumentisto/kurento-media-server
-VERSION ?= 6.8.1-r2
-TAGS ?= 6.8.1-r2,6.8.1,6.8,6,latest
+VERSION ?= 6.9.0-r3
+TAGS ?= 6.9.1-r3,6.9.0,6.9,6,latest
 
 
 comma := ,
@@ -127,6 +127,7 @@ test:
 	           -e KMS_TURN_URL=test_turn_url \
 	           -e KMS_STUN_IP=test_stun_ip \
 	           -e KMS_STUN_PORT=1234 \
+	           -e KMS_EXTERNAL_IPS=test_external_ips \
 		$(IMAGE_NAME):$(VERSION)
 	sleep 20
 	docker exec $(test-container-name) \
