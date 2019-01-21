@@ -1,31 +1,31 @@
-# Base dependencies
-FROM ubuntu:xenial AS base
 
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 5AFA7A83 \
- && echo "deb http://ubuntu.openvidu.io/dev xenial kms6" \
-    | tee /etc/apt/sources.list.d/kurento.list \
- && apt-get update \
- && apt-get install -y --no-install-recommends \
-            wget \
-            bzip2
+FROM buildpack-deps:xenial AS builder
 
-# Install GStreamer with plugins
-FROM base AS gstreamer
+# Configure environment:
+# * LANG: Set the default locale for all commands
+# * DEBIAN_FRONTEND: Disable user-facing questions and messages
+# * PYTHONUNBUFFERED: Disable stdin, stdout, stderr buffering in Python
+ENV LANG=C.UTF-8 \
+    DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1
 
-RUN apt-get install -y --no-install-recommends \
-            gstreamer1.5-plugins-base \
-            gstreamer1.5-plugins-good \
-            gstreamer1.5-plugins-bad \
-            gstreamer1.5-plugins-ugly \
-            gstreamer1.5-libav \
-            gstreamer1.5-nice \
-            gstreamer1.5-tools \
-            gstreamer1.5-x \
-            openh264-gst-plugins-bad-1.5 \
-            openwebrtc-gst-plugins
+# CMake accepts the following build types: Debug, Release, RelWithDebInfo.
+# So, for a debug build, you would run TYPE=Debug instead of TYPE=Release.
+ENV TYPE=Release
+ENV PATH="/adm-scripts:/adm-scripts/kms:$PATH"
+
+# Configure apt-get:
+# * Disable installation of recommended and suggested packages
+# * Use the Openvidu package proxy
+# * Fix issues with Node.js package repo
+# * Add Kurento package repository
+RUN git clone https://github.com/Kurento/adm-scripts.git \
+ && /adm-scripts/development/kurento-repo-xenial-nightly-2018 \
+ && /adm-scripts/development/kurento-install-development
 
 
-FROM flexconstructor/kms-builder:latest  AS build
+
+FROM builder AS build
 
 # Download Kurento media server project sources
 # Download Kurento media server project sources
@@ -133,7 +133,7 @@ RUN git clone https://github.com/Kurento/kms-omni-build.git /.kms \
 
 
 # Result image
-FROM gstreamer AS kurento
+FROM ubuntu:xenial AS kurento
 
 # Use default suggested logging levels:
 # https://doc-kurento.readthedocs.io/en/latest/features/logging.html#suggested-levels
@@ -145,17 +145,36 @@ COPY --from=build /dist /
 
 COPY rootfs /
 
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 5AFA7A83 \
+ && echo "deb http://ubuntu.openvidu.io/dev xenial kms6" \
+    | tee /etc/apt/sources.list.d/kurento.list \
+ && apt-get update \
+ && apt-get install -y --no-install-recommends \
+            wget \
+            bzip2
 # Complete installation
 RUN apt-get install -y --reinstall ca-certificates \
  && apt-get install -y --no-install-recommends \
-            supervisor \
             curl \
+            wget \
+            bzip2 \
+            supervisor \
             net-tools \
             kmsjsoncpp \
             libboost-log1.58.0 \
             libboost-program-options1.58.0 \
             libglibmm-2.4-1v5 \
             libsigc++-2.0-0v5 \
+            gstreamer1.5-plugins-base \
+            gstreamer1.5-plugins-good \
+            gstreamer1.5-plugins-bad \
+            gstreamer1.5-plugins-ugly \
+            gstreamer1.5-libav \
+            gstreamer1.5-nice \
+            gstreamer1.5-tools \
+            gstreamer1.5-x \
+            openh264-gst-plugins-bad-1.5 \
+            openwebrtc-gst-plugins \
  # Fill up dynamic libs
  && ln -s /usr/local/lib/libjsonrpc.so.6 \
           /kurento-media-server/plugins/libjsonrpc.so \

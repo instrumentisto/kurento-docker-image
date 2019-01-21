@@ -2,6 +2,9 @@
 
 set -e
 
+ echo ";; Web RTC endpoint configuration" \
+    > /kurento-media-server/server/config/kurento/WebRtcEndpoint.conf.ini
+
 if [ -n "$KMS_TURN_URL" ]; then
   echo "turnURL=$KMS_TURN_URL" \
     >> /kurento-media-server/server/config/kurento/WebRtcEndpoint.conf.ini
