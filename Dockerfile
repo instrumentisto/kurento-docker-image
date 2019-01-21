@@ -26,16 +26,44 @@ RUN apt-get install -y --no-install-recommends \
 
 FROM flexconstructor/kms-builder:latest  AS build
 
-ENV OMNY_BUILD_VERSION=dev
-ENV KURENTO_VERSION=6.9.0
-ENV PYTHONUNBUFFERED=1
-
 # Download Kurento media server project sources
-RUN git clone https://github.com/instrumentisto/kms-omni-build.git /.kms \
+# Download Kurento media server project sources
+RUN git clone https://github.com/Kurento/kms-omni-build.git /.kms \
  && cd /.kms/ \
- && git checkout $OMNY_BUILD_VERSION \
+ && git checkout 722df59b98dcdeda12151ee2d3a32c847e3fee62 \
+ ## kms-elements fork
+ && git config -f .gitmodules submodule.kms-elements.url https://github.com/instrumentisto/kms-elements.git \
+ && git config -f .gitmodules submodule.kms-elements.branch master \
  ## init
  && git submodule update --init --recursive \
+ ## kms-cmake-utils
+ && cd kms-cmake-utils \
+ && git checkout b931efc0f5f095698956ba29f85b4aa1d784e3e0 \
+ && cd .. \
+ ## kms-jsonrpc
+ && cd kms-jsonrpc \
+ && git checkout 70a71812f21d5cd0cc9d4fb36c19ae48ca2f05bd \
+ && cd .. \
+ ## kms-core
+ && cd kms-core \
+ && git checkout fe35efe08815926dbe511b1063cf7dbb2b91563e \
+ && cd .. \
+ ## kurento-module-creator
+ && cd kurento-module-creator \
+ && git checkout 9683681dcb1bad8c5cc5d42ea313973f5857115d \
+ && cd .. \
+ ## kms-elements
+ && cd kms-elements \
+ && git checkout 6b4ad504c624c9f8c5714509ffe377ed5622a639 \
+ && cd .. \
+ ## kms-filters
+ && cd kms-filters \
+ && git checkout cd1bab9e52864fc27a704f81dcf6ae9165ec0c78 \
+ && cd .. \
+ ## kurento-media-server
+ && cd kurento-media-server \
+ && git checkout d7c98feb60938c8b4da952363fd98da2f1f1b869 \
+ && cd .. \
  && mkdir -p /.kms/build/ \
  && cd /.kms/build/ \
  && cmake -DCMAKE_BUILD_TYPE=$TYPE \
