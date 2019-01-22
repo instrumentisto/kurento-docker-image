@@ -1,130 +1,65 @@
-# Base dependencies
-FROM ubuntu:xenial AS base
 
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 5AFA7A83 \
- && echo "deb http://ubuntu.openvidu.io/dev xenial kms6" \
-    | tee /etc/apt/sources.list.d/kurento.list \
- && apt-get update \
- && apt-get install -y --no-install-recommends \
-            wget \
-            bzip2
+FROM buildpack-deps:xenial AS builder
 
+# Configure environment:
+# * LANG: Set the default locale for all commands
+# * DEBIAN_FRONTEND: Disable user-facing questions and messages
+# * PYTHONUNBUFFERED: Disable stdin, stdout, stderr buffering in Python
+ENV LANG=C.UTF-8 \
+    DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1
 
-# Build libnice fork from https://github.com/alexlapa/libnice
-FROM base AS libnice
-
-RUN apt-get install -y --no-install-recommends \
-            build-essential \
-            cmake \
-            autotools-dev \
-            dh-autoreconf \
-            cdbs \
-            libglib2.0-dev \
-            libgnutls-dev \
-            gtk-doc-tools \
- # Install custom libnice
- && wget -O libnice.tar.gz \
-         https://github.com/alexlapa/libnice/archive/master.tar.gz \
- && tar -xvzf libnice.tar.gz \
- && cd libnice-master \
- && ./autogen.sh \
- && ./configure --libdir=/usr/lib/x86_64-linux-gnu/libnice/ \
- && make -j8 \
- && make install
-
-
-# Install GStreamer with plugins
-FROM base AS gstreamer
-
-RUN apt-get install -y --no-install-recommends \
-            gstreamer1.5-plugins-base \
-            gstreamer1.5-plugins-good \
-            gstreamer1.5-plugins-bad \
-            gstreamer1.5-plugins-ugly \
-            gstreamer1.5-libav \
-            gstreamer1.5-nice \
-            gstreamer1.5-tools \
-            gstreamer1.5-x \
-            openh264-gst-plugins-bad-1.5 \
-            openwebrtc-gst-plugins
-
-# Update libnice
-COPY --from=libnice /usr/lib/x86_64-linux-gnu/libnice/ \
-                    /usr/lib/x86_64-linux-gnu/
-
-RUN ldconfig -n /usr/lib/x86_64-linux-gnu
-
-
-# Build Kurento media server
-FROM gstreamer AS dist
-
-# CMake accepts the following build types: Debug, Release, RelWithDebInfo. 
+# CMake accepts the following build types: Debug, Release, RelWithDebInfo.
 # So, for a debug build, you would run TYPE=Debug instead of TYPE=Release.
-ARG TYPE=Release
+ENV TYPE=Release
+ENV PATH="/adm-scripts:/adm-scripts/kms:$PATH"
 
-RUN apt-get install -y --no-install-recommends \
-            build-essential \
-            cmake \
-            software-properties-common \
-            autotools-dev \
-            dh-autoreconf \
-            debhelper \
-            default-jdk \
-            gdb \
-            gcc \
-            git openssh-client \
-            maven \
-            pkg-config \
-            maven-debian-helper- \
-            # System development libraries
-            libboost-dev \
-            libboost-filesystem-dev \
-            libboost-regex-dev \
-            libboost-system-dev \
-            libboost-test-dev \
-            libboost-thread-dev \
-            libevent-dev \
-            libglibmm-2.4-dev \
-            libopencv-dev \
-            libsigc++-2.0-dev \
-            libsoup2.4-dev \
-            libssl-dev \
-            libvpx-dev \
-            libxml2-utils \
-            uuid-dev \
-            libgstreamer1.5-dev \
-            libgstreamer-plugins-base1.5-dev \
-            openwebrtc-gst-plugins-dev \
-            libnice-dev \
-            kmsjsoncpp-dev \
-            libboost-log-dev \
-            libboost-program-options-dev \
-            libglibmm-2.4-dev
+RUN git clone https://github.com/Kurento/adm-scripts.git \
+ && /adm-scripts/development/kurento-repo-xenial-nightly-2018 \
+ && /adm-scripts/development/kurento-install-development
 
+
+FROM builder AS build
+
+# Download Kurento media server project sources
 # Download Kurento media server project sources
 RUN git clone https://github.com/Kurento/kms-omni-build.git /.kms \
  && cd /.kms/ \
  && git checkout 722df59b98dcdeda12151ee2d3a32c847e3fee62 \
- && git config -f .gitmodules \
-    submodule.kms-cmake-utils.commit b931efc0f5f095698956ba29f85b4aa1d784e3e0 \
- && git config -f .gitmodules \
-    submodule.kms-jsonrpc.commit 70a71812f21d5cd0cc9d4fb36c19ae48ca2f05bd \
- && git config -f .gitmodules \
-    submodule.kms-core.commit fe35efe08815926dbe511b1063cf7dbb2b91563e \
- && git config -f .gitmodules \
-    submodule.kurento-module-creator.commit 9683681dcb1bad8c5cc5d42ea313973f5857115d \
- && git config -f .gitmodules \
-    submodule.kms-elements.commit 85071d7acf47a2a87e1fa772acad2f686b7a14b4 \
- && git config -f .gitmodules \
-    submodule.kms-filters.commit cd1bab9e52864fc27a704f81dcf6ae9165ec0c78 \
- && git config -f .gitmodules \
-    submodule.kurento-media-server.commit d7c98feb60938c8b4da952363fd98da2f1f1b869 \
+ ## kms-elements fork
+ && git config -f .gitmodules submodule.kms-elements.url https://github.com/instrumentisto/kms-elements.git \
+ && git config -f .gitmodules submodule.kms-elements.branch master \
+ ## init
  && git submodule update --init --recursive \
- && git submodule update --remote \
- && cat .gitmodules
-
-# Build Kurento media server project
-RUN mkdir -p /.kms/build/ \
+ ## kms-cmake-utils
+ && cd kms-cmake-utils \
+ && git checkout b931efc0f5f095698956ba29f85b4aa1d784e3e0 \
+ && cd .. \
+ ## kms-jsonrpc
+ && cd kms-jsonrpc \
+ && git checkout 70a71812f21d5cd0cc9d4fb36c19ae48ca2f05bd \
+ && cd .. \
+ ## kms-core
+ && cd kms-core \
+ && git checkout fe35efe08815926dbe511b1063cf7dbb2b91563e \
+ && cd .. \
+ ## kurento-module-creator
+ && cd kurento-module-creator \
+ && git checkout 9683681dcb1bad8c5cc5d42ea313973f5857115d \
+ && cd .. \
+ ## kms-elements
+ && cd kms-elements \
+ && git checkout 6b4ad504c624c9f8c5714509ffe377ed5622a639 \
+ && cd .. \
+ ## kms-filters
+ && cd kms-filters \
+ && git checkout cd1bab9e52864fc27a704f81dcf6ae9165ec0c78 \
+ && cd .. \
+ ## kurento-media-server
+ && cd kurento-media-server \
+ && git checkout d7c98feb60938c8b4da952363fd98da2f1f1b869 \
+ && cd .. \
+ && mkdir -p /.kms/build/ \
  && cd /.kms/build/ \
  && cmake -DCMAKE_BUILD_TYPE=$TYPE \
           -DENABLE_ANALYZER_ASAN=ON \
@@ -132,10 +67,10 @@ RUN mkdir -p /.kms/build/ \
           -DSANITIZE_THREAD=ON \
           -DSANITIZE_LINK_STATIC=ON \
         .. \
- && make
+ && make  \
 
-# Prepare Kurento media server project installation
-RUN mkdir -p /dist/kurento-media-server/server/config/kurento/ \
+ # Prepare Kurento media server project installation
+ && mkdir -p /dist/kurento-media-server/server/config/kurento/ \
  && mkdir -p /dist/kurento-media-server/plugins/ \
  && mkdir -p /dist/usr/local/lib/ \
  # Copy kurento-media-server binary
@@ -192,7 +127,7 @@ RUN mkdir -p /dist/kurento-media-server/server/config/kurento/ \
 
 
 # Result image
-FROM gstreamer AS kurento
+FROM ubuntu:xenial AS kurento
 
 # Use default suggested logging levels:
 # https://doc-kurento.readthedocs.io/en/latest/features/logging.html#suggested-levels
@@ -200,21 +135,37 @@ ENV GST_DEBUG="3,Kurento*:3,kms*:3,sdp*:3,webrtc*:4,*rtpendpoint:4,rtp*handler:4
     # Disable colors in debug logs
     GST_DEBUG_NO_COLOR=1
 
-COPY --from=dist /dist /
+COPY --from=build /dist /
 
 COPY rootfs /
 
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 5AFA7A83 \
+ && echo "deb http://ubuntu.openvidu.io/dev xenial kms6" \
+    | tee /etc/apt/sources.list.d/kurento.list
 # Complete installation
-RUN apt-get install -y --reinstall ca-certificates \
+RUN apt-get update \
  && apt-get install -y --no-install-recommends \
-            supervisor \
+                       --reinstall ca-certificates \
             curl \
+            wget \
+            bzip2 \
+            supervisor \
             net-tools \
             kmsjsoncpp \
             libboost-log1.58.0 \
             libboost-program-options1.58.0 \
             libglibmm-2.4-1v5 \
             libsigc++-2.0-0v5 \
+            gstreamer1.5-plugins-base \
+            gstreamer1.5-plugins-good \
+            gstreamer1.5-plugins-bad \
+            gstreamer1.5-plugins-ugly \
+            gstreamer1.5-libav \
+            gstreamer1.5-nice \
+            gstreamer1.5-tools \
+            gstreamer1.5-x \
+            openh264-gst-plugins-bad-1.5 \
+            openwebrtc-gst-plugins \
  # Fill up dynamic libs
  && ln -s /usr/local/lib/libjsonrpc.so.6 \
           /kurento-media-server/plugins/libjsonrpc.so \

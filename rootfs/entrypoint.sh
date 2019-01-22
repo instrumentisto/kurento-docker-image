@@ -2,6 +2,9 @@
 
 set -e
 
+ echo ";; Web RTC endpoint configuration" \
+    > /kurento-media-server/server/config/kurento/WebRtcEndpoint.conf.ini
+
 if [ -n "$KMS_TURN_URL" ]; then
   echo "turnURL=$KMS_TURN_URL" \
     >> /kurento-media-server/server/config/kurento/WebRtcEndpoint.conf.ini
@@ -11,6 +14,11 @@ if [ -n "$KMS_STUN_IP" -a -n "$KMS_STUN_PORT" ]; then
   echo "stunServerAddress=$KMS_STUN_IP" \
     >> /kurento-media-server/server/config/kurento/WebRtcEndpoint.conf.ini
   echo "stunServerPort=$KMS_STUN_PORT" \
+    >> /kurento-media-server/server/config/kurento/WebRtcEndpoint.conf.ini
+fi
+
+if [ -n "$KMS_EXTERNAL_IPS" ]; then
+  echo "externalIPs=$KMS_EXTERNAL_IPS" \
     >> /kurento-media-server/server/config/kurento/WebRtcEndpoint.conf.ini
 fi
 
