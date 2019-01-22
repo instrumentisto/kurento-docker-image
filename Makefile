@@ -11,7 +11,7 @@
 #	make release
 
 
-IMAGE_NAME := instrumentisto/kurento-media-server
+IMAGE_NAME := instrumentisto/kurento
 VERSION ?= 6.9.0-r3
 TAGS ?= 6.9.1-r3,6.9.0,6.9,6,latest
 
