@@ -14,15 +14,9 @@ ENV LANG=C.UTF-8 \
 ENV TYPE=Release
 ENV PATH="/adm-scripts:/adm-scripts/kms:$PATH"
 
-# Configure apt-get:
-# * Disable installation of recommended and suggested packages
-# * Use the Openvidu package proxy
-# * Fix issues with Node.js package repo
-# * Add Kurento package repository
 RUN git clone https://github.com/Kurento/adm-scripts.git \
  && /adm-scripts/development/kurento-repo-xenial-nightly-2018 \
  && /adm-scripts/development/kurento-install-development
-
 
 
 FROM builder AS build
@@ -147,14 +141,11 @@ COPY rootfs /
 
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 5AFA7A83 \
  && echo "deb http://ubuntu.openvidu.io/dev xenial kms6" \
-    | tee /etc/apt/sources.list.d/kurento.list \
- && apt-get update \
- && apt-get install -y --no-install-recommends \
-            wget \
-            bzip2
+    | tee /etc/apt/sources.list.d/kurento.list
 # Complete installation
-RUN apt-get install -y --reinstall ca-certificates \
+RUN apt-get update \
  && apt-get install -y --no-install-recommends \
+                       --reinstall ca-certificates \
             curl \
             wget \
             bzip2 \

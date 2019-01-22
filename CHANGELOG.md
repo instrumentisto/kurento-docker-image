@@ -13,7 +13,7 @@ All user visible changes to this project will be documented in this file. This p
 - Deployment:
     - Improve Kurento healthcheck. Checking for the presence of an active web-socket connection on port 8888, use netstat(#2).
     - Disable Kurento autorestart via supervisord child.
-    - Add 
+    
 
 #### Build
 
