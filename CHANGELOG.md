@@ -6,7 +6,7 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [6.9.0-r2]· 2018-12-?
+## [6.9.0-r2]· 2019-01-22
 
 #### BC Breaks
 
@@ -21,7 +21,7 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [6.8.1-r1]· 2018-12-?
+## [6.8.1-r1]· 2018-12-14
 
 #### BC Breaks
 
