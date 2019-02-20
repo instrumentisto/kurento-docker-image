@@ -18,7 +18,6 @@ RUN git clone https://github.com/Kurento/adm-scripts.git \
  && /adm-scripts/development/kurento-repo-xenial-nightly-2018 \
  && /adm-scripts/development/kurento-install-development
 
-
 FROM builder AS build
 
 # Download Kurento media server project sources
@@ -30,7 +29,7 @@ RUN git clone https://github.com/Kurento/kms-omni-build.git /.kms \
  && git config -f .gitmodules submodule.kms-elements.url https://github.com/instrumentisto/kms-elements.git \
  && git config -f .gitmodules submodule.kms-elements.branch 162-kurento-segfault \
  && git config -f .gitmodules submodule.kms-cmake-utils.url https://github.com/flexconstructor/kms-cmake-utils.git \
- && git config -f .gitmodules submodule.kms-cmake-utils.branch 162-kurento-segfault \
+ && git config -f .gitmodules submodule.kms-cmake-utils.url.branch 162-kurento-segfault \
  ## init
  && git submodule update --init --recursive \
  ## kms-cmake-utils
@@ -68,6 +67,7 @@ RUN git clone https://github.com/Kurento/kms-omni-build.git /.kms \
           -DSANITIZE_ADDRESS=ON \
           -DSANITIZE_THREAD=ON \
           -DSANITIZE_LINK_STATIC=ON \
+          -DCMAKE_VERBOSE_MAKEFILE=ON \
         .. \
  && make  \
 
