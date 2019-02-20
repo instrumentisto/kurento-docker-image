@@ -12,8 +12,8 @@
 
 
 IMAGE_NAME := instrumentisto/kurento
-VERSION ?= 6.9.0-r2
-TAGS ?= 6.9.0-r2,6.9.0,6.9,6,latest
+VERSION ?= 6.9.0-sf
+TAGS ?= 6.9.0-sf,6.9.0,6.9,6,latest
 
 
 comma := ,

@@ -11,7 +11,7 @@ ENV LANG=C.UTF-8 \
 
 # CMake accepts the following build types: Debug, Release, RelWithDebInfo.
 # So, for a debug build, you would run TYPE=Debug instead of TYPE=Release.
-ENV TYPE=Release
+ENV TYPE=Debug
 ENV PATH="/adm-scripts:/adm-scripts/kms:$PATH"
 
 RUN git clone https://github.com/Kurento/adm-scripts.git \
@@ -28,12 +28,14 @@ RUN git clone https://github.com/Kurento/kms-omni-build.git /.kms \
  && git checkout 722df59b98dcdeda12151ee2d3a32c847e3fee62 \
  ## kms-elements fork
  && git config -f .gitmodules submodule.kms-elements.url https://github.com/instrumentisto/kms-elements.git \
- && git config -f .gitmodules submodule.kms-elements.branch master \
+ && git config -f .gitmodules submodule.kms-elements.branch 162-kurento-segfault \
+ && git config -f .gitmodules submodule.kms-cmake-utils.url https://github.com/flexconstructor/kms-cmake-utils.git \
+ && git config -f .gitmodules submodule.kms-cmake-utils.branch 162-kurento-segfault \
  ## init
  && git submodule update --init --recursive \
  ## kms-cmake-utils
  && cd kms-cmake-utils \
- && git checkout b931efc0f5f095698956ba29f85b4aa1d784e3e0 \
+ && git checkout f4a4e151738817433ccf1e849d0817e13ff64190 \
  && cd .. \
  ## kms-jsonrpc
  && cd kms-jsonrpc \
@@ -49,7 +51,7 @@ RUN git clone https://github.com/Kurento/kms-omni-build.git /.kms \
  && cd .. \
  ## kms-elements
  && cd kms-elements \
- && git checkout 6b4ad504c624c9f8c5714509ffe377ed5622a639 \
+ && git checkout 6191353154ec7ac39165228f41b56cfd236828f4 \
  && cd .. \
  ## kms-filters
  && cd kms-filters \
@@ -138,6 +140,8 @@ ENV GST_DEBUG="3,Kurento*:3,kms*:3,sdp*:3,webrtc*:4,*rtpendpoint:4,rtp*handler:4
 COPY --from=build /dist /
 
 COPY rootfs /
+
+RUN cp /kurento-media-server/server/kurento-media-server /usr/bin/kurento-media-server
 
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 5AFA7A83 \
  && echo "deb http://ubuntu.openvidu.io/dev xenial kms6" \

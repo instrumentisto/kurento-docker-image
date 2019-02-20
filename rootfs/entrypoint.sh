@@ -25,7 +25,8 @@ fi
 # Remove IPv6 local loop until IPv6 is supported
 cat /etc/hosts | sed '/::1/d' | tee /etc/hosts > /dev/null
 
-exec server/kurento-media-server \
+exec /usr/bin/kurento-media-server \
+  -d /var/log/kurento-media-server \
   --modules-path=. \
   --modules-config-path=./server/config \
   --conf-file=./server/config/kurento.conf.json \
