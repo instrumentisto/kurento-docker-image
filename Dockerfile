@@ -11,12 +11,13 @@ ENV LANG=C.UTF-8 \
 
 # CMake accepts the following build types: Debug, Release, RelWithDebInfo.
 # So, for a debug build, you would run TYPE=Debug instead of TYPE=Release.
-ENV TYPE=Debug
+ENV TYPE=Release
 ENV PATH="/adm-scripts:/adm-scripts/kms:$PATH"
 
 RUN git clone https://github.com/Kurento/adm-scripts.git \
  && /adm-scripts/development/kurento-repo-xenial-nightly-2018 \
  && /adm-scripts/development/kurento-install-development
+
 
 FROM builder AS build
 
@@ -28,13 +29,13 @@ RUN git clone https://github.com/Kurento/kms-omni-build.git /.kms \
  ## kms-elements fork
  && git config -f .gitmodules submodule.kms-elements.url https://github.com/instrumentisto/kms-elements.git \
  && git config -f .gitmodules submodule.kms-elements.branch 162-kurento-segfault \
- && git config -f .gitmodules submodule.kms-cmake-utils.url https://github.com/flexconstructor/kms-cmake-utils.git \
- && git config -f .gitmodules submodule.kms-cmake-utils.url.branch 162-kurento-segfault \
+ && git config -f .gitmodules submodule.kurento-media-server.url https://github.com/flexconstructor/kurento-media-server.git \
+ && git config -f .gitmodules submodule.kurento-media-server.branch 162-kurento-segfault \
  ## init
  && git submodule update --init --recursive \
  ## kms-cmake-utils
  && cd kms-cmake-utils \
- && git checkout f4a4e151738817433ccf1e849d0817e13ff64190 \
+ && git checkout b931efc0f5f095698956ba29f85b4aa1d784e3e0 \
  && cd .. \
  ## kms-jsonrpc
  && cd kms-jsonrpc \
@@ -58,7 +59,7 @@ RUN git clone https://github.com/Kurento/kms-omni-build.git /.kms \
  && cd .. \
  ## kurento-media-server
  && cd kurento-media-server \
- && git checkout d7c98feb60938c8b4da952363fd98da2f1f1b869 \
+ && git checkout 4c76c7d9354468bd7d2b1b5545001c8e2ac0eef1 \
  && cd .. \
  && mkdir -p /.kms/build/ \
  && cd /.kms/build/ \
@@ -141,8 +142,6 @@ COPY --from=build /dist /
 
 COPY rootfs /
 
-RUN cp /kurento-media-server/server/kurento-media-server /usr/bin/kurento-media-server
-
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 5AFA7A83 \
  && echo "deb http://ubuntu.openvidu.io/dev xenial kms6" \
     | tee /etc/apt/sources.list.d/kurento.list
@@ -187,6 +186,7 @@ RUN apt-get update \
           /kurento-media-server/plugins/libwebrtcdataproto.so \
  && ln -s /usr/local/lib/libkmscoreimpl.so.6 \
           /kurento-media-server/plugins/libkmscoreimpl.so \
+ && cp /kurento-media-server/server/kurento-media-server /usr/bin/kurento-media-server \
  && ldconfig \
  # Ensure correct rights on executables
  && chmod +x /entrypoint.sh \
