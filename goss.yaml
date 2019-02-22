@@ -9,42 +9,42 @@ package:
   libgstreamer1.5-0:amd64:
     installed: true
     versions:
-      - 1.8.1.1.xenial~20181018130734.170.0d6031b
+      - 1.8.1-1kurento1.16.04~20190214125843.gbp059291
   # gstreamer1.5-plugins-base installed
   gstreamer1.5-plugins-base:
     installed: true
     versions:
-      - 1.8.1.1.xenial~20181018132104.55.7b19cfd
+      - 1.8.1-1kurento1.16.04~20190214125843.gbp330b77
   # libnice installed
   gstreamer1.5-nice:
     installed: true
     versions:
-      - 0.1.15-1kurento2~20181207131058.gbp03e0b4
+      - 0.1.15-1kurento2.16.04~20190214125843.gbpaa63a5
   # gstreamer1.5-plugins-bad installed
   gstreamer1.5-plugins-bad:amd64:
     installed: true
     versions:
-      - 1.8.1.1.xenial~20181018134602.100.3db37b1
+      - 1.8.1-1kurento1.16.04~20190214125843.gbp1d8070
   # gstreamer1.5-plugins-ugly installed
   gstreamer1.5-plugins-ugly:
     installed: true
     versions:
-      - 1.8.1.1.xenial~20181018140138.89.2685b0f
+      - 1.8.1-1kurento1.16.04~20190214125843.gbpbed8b0
   # gstreamer1.5-libav installed
   gstreamer1.5-libav:
     installed: true
     versions:
-      - 1.8.2.1.xenial~20181018140706.96.493eee4
+      - 1.8.1-1kurento1.16.04~20190214125843.gbpb33143
   # gstreamer1.5-tools installed
   gstreamer1.5-tools:
     installed: true
     versions:
-      - 1.8.1.1.xenial~20181018130734.170.0d6031b
+      - 1.8.1-1kurento1.16.04~20190214125843.gbp059291
   # checks openh26 installed
   openh264:
     installed: true
     versions:
-      - 1.4.0.xenial~20181018130100.2.5faa3d1
+      - 1.4.0-1kurento1.16.04~20190214125843.gbpb8cb17
 
 # Check Kurento port listening
 port:

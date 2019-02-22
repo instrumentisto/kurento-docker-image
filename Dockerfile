@@ -28,9 +28,9 @@ RUN git clone https://github.com/Kurento/kms-omni-build.git /.kms \
  && git checkout 722df59b98dcdeda12151ee2d3a32c847e3fee62 \
  ## kms-elements fork
  && git config -f .gitmodules submodule.kms-elements.url https://github.com/instrumentisto/kms-elements.git \
- && git config -f .gitmodules submodule.kms-elements.branch 162-kurento-segfault \
+ && git config -f .gitmodules submodule.kms-elements.branch master \
  && git config -f .gitmodules submodule.kurento-media-server.url https://github.com/flexconstructor/kurento-media-server.git \
- && git config -f .gitmodules submodule.kurento-media-server.branch 162-kurento-segfault \
+ && git config -f .gitmodules submodule.kurento-media-server.branch master \
  ## init
  && git submodule update --init --recursive \
  ## kms-cmake-utils
@@ -51,7 +51,7 @@ RUN git clone https://github.com/Kurento/kms-omni-build.git /.kms \
  && cd .. \
  ## kms-elements
  && cd kms-elements \
- && git checkout 6191353154ec7ac39165228f41b56cfd236828f4 \
+ && git checkout 6b4ad504c624c9f8c5714509ffe377ed5622a639 \
  && cd .. \
  ## kms-filters
  && cd kms-filters \
@@ -59,7 +59,7 @@ RUN git clone https://github.com/Kurento/kms-omni-build.git /.kms \
  && cd .. \
  ## kurento-media-server
  && cd kurento-media-server \
- && git checkout 4c76c7d9354468bd7d2b1b5545001c8e2ac0eef1 \
+ && git checkout f48684873b269cbe0e32ecf1a5821c8abc090896 \
  && cd .. \
  && mkdir -p /.kms/build/ \
  && cd /.kms/build/ \
