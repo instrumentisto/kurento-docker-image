@@ -136,9 +136,8 @@ RUN apt-get install -y autopoint \
                        freeglut3 \
                        freeglut3-dev
 
-RUN git clone https://github.com/flexconstructor/gst-plugins-bad.git \
+RUN git clone https://github.com/Kurento/gst-plugins-bad.git \
 && cd gst-plugins-bad \
-&& git checkout 222ac71cbe6e62be7b808b4621793b5ffb66d4a8 \
 && autopoint --force \
 && sh autogen.sh \
 && make
