@@ -15,6 +15,8 @@ ENV TYPE=Release
 ENV PATH="/adm-scripts:/adm-scripts/kms:$PATH"
 
 RUN git clone https://github.com/Kurento/adm-scripts.git \
+ && cd adm-scripts \
+ && git checkout 28ba87171f3b2f5a7803da2bac527fb5d80366a9 \
  && /adm-scripts/development/kurento-repo-xenial-nightly-2018 \
  && /adm-scripts/development/kurento-install-development
 
@@ -126,6 +128,24 @@ RUN git clone https://github.com/Kurento/kms-omni-build.git /.kms \
        /dist/usr/local/lib/libwebrtcdataproto.so.6
 
 
+
+FROM build AS plugin_builder
+
+RUN apt-get install -y autopoint \
+                       gtk-doc-tools \
+                       freeglut3 \
+                       freeglut3-dev
+
+RUN git clone https://github.com/flexconstructor/gst-plugins-bad.git \
+&& cd gst-plugins-bad \
+&& git checkout 222ac71cbe6e62be7b808b4621793b5ffb66d4a8 \
+&& autopoint --force \
+&& sh autogen.sh \
+&& make
+
+
+
+
 # Result image
 FROM ubuntu:xenial AS kurento
 
@@ -136,6 +156,8 @@ ENV GST_DEBUG="3,Kurento*:3,kms*:3,sdp*:3,webrtc*:4,*rtpendpoint:4,rtp*handler:4
     GST_DEBUG_NO_COLOR=1
 
 COPY --from=build /dist /
+
+COPY --from=plugin_builder /usr/lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu
 
 COPY rootfs /
 
@@ -158,7 +180,6 @@ RUN apt-get update \
             libsigc++-2.0-0v5 \
             gstreamer1.5-plugins-base \
             gstreamer1.5-plugins-good \
-            gstreamer1.5-plugins-bad \
             gstreamer1.5-plugins-ugly \
             gstreamer1.5-libav \
             gstreamer1.5-nice \
