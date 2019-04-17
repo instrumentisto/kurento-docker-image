@@ -95,9 +95,9 @@ RUN git clone https://github.com/Kurento/kms-omni-build.git  /.kms\
    && mkdir -p /.kms/build/ \
    && cd /.kms/build/ \
    && cmake -DCMAKE_BUILD_TYPE=$TYPE \
-            -DENABLE_ANALYZER_ASAN=ON \
-            -DSANITIZE_ADDRESS=ON \
             #  integration with these tools is not really finished
+            -DENABLE_ANALYZER_ASAN=OFF \
+            -DSANITIZE_ADDRESS=OFF \
             -DSANITIZE_THREAD=OFF \
             -DSANITIZE_LINK_STATIC=OFF \
              .. \
@@ -118,8 +118,8 @@ RUN mkdir -p /dist/usr/lib/x86_64-linux-gnu/kurento/modules/ \
             /dist/usr/lib/x86_64-linux-gnu/kurento/modules/libkmssdpagent.so.6
 
 
-FROM ubuntu:bionic AS Kurento
 
+FROM ubuntu:bionic AS Kurento
 
 # Configure environment
 # * LANG: Set the default locale for all commands
@@ -147,8 +147,6 @@ RUN apt-get update \
         supervisor \
         curl \
         net-tools \
-
-
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Configure apt-get
@@ -177,7 +175,6 @@ RUN apt-get update \
   && (curl -fsSL https://goss.rocks/install | sh)
 
 COPY --from=builder /dist /
-
 
 EXPOSE 8888
 
