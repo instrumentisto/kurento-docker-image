@@ -6,6 +6,16 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [6.10.0-r3]· 2019-03-18
+
+#### Build
+
+- Build image from [Ubuntu Bionic Beaver][3]
+- Build kurento-media-server from [v6.10.0][4]
+
+
+
+
 ## [6.9.0-r2]· 2019-01-22
 
 #### BC Breaks
@@ -33,3 +43,5 @@ All user visible changes to this project will be documented in this file. This p
 
 [1]: https://github.com/Kurento/kurento-media-server/releases/tag/6.9.0
 [2]: https://github.com/instrumentisto/kms-elements
+[3]: http://releases.ubuntu.com/18.04/
+[4]: https://github.com/Kurento/kurento-media-server/releases/tag/6.10.0
