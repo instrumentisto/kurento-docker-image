@@ -31,7 +31,7 @@ RUN git clone https://github.com/Kurento/kms-omni-build.git  /.kms\
 
   ## kms-elements fork
   && git config -f .gitmodules submodule.kms-elements.url https://github.com/instrumentisto/kms-elements.git \
-  && git config -f .gitmodules submodule.kms-elements.branch 166-up-kurento-version \
+  && git config -f .gitmodules submodule.kms-elements.branch master \
 
   ## init
   && git submodule update --init --recursive \
@@ -70,7 +70,7 @@ RUN git clone https://github.com/Kurento/kms-omni-build.git  /.kms\
 
   ## kms-elements
   && cd kms-elements \
-  && git checkout c50f4570be628ee904a518857343562c1d5b3234 \
+  && git checkout 0aa8ea38fc1f686362979865f9b649e505ea78ff \
   && mk-build-deps --install --remove \
               --tool='apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes' \
               "debian/control" \
