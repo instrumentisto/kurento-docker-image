@@ -70,7 +70,7 @@ RUN git clone https://github.com/Kurento/kms-omni-build.git  /.kms\
 
   ## kms-elements
   && cd kms-elements \
-  && git checkout 0aa8ea38fc1f686362979865f9b649e505ea78ff \
+  && git checkout 65acb66cd7d6b7a30287b63330b5f66125435e69 \
   && mk-build-deps --install --remove \
               --tool='apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes' \
               "debian/control" \
@@ -103,19 +103,27 @@ RUN git clone https://github.com/Kurento/kms-omni-build.git  /.kms\
              .. \
     && make
 
-RUN mkdir -p /dist/usr/lib/x86_64-linux-gnu/kurento/modules/ \
+RUN mkdir -p /dist/usr/lib/x86_64-linux-gnu/ \
+     && mkdir -p /dist/etc/kurento/modules/kurento/ \
+     && mkdir -p /dist/usr/bin/ \
      # Copy plugins
      && cp /.kms/build/kms-elements/src/server/libkmselementsmodule.so \
-           dist/usr/lib/x86_64-linux-gnu/kurento/modules/libkmselementsmodule.so \
+           dist/usr/lib/x86_64-linux-gnu/libkmselementsmodule.so \
      && cp /.kms/build/kms-elements/src/gst-plugins/webrtcendpoint/libwebrtcendpoint.so \
-           /dist/usr/lib/x86_64-linux-gnu/kurento/modules/libwebrtcendpoint.so \
+           /dist/usr/lib/x86_64-linux-gnu/libwebrtcendpoint.so \
      # Copy shared libs
      && cp /.kms/build/kms-elements/src/gst-plugins/webrtcendpoint/libkmswebrtcendpointlib.so \
-          /dist/usr/lib/x86_64-linux-gnu/kurento/modules/libkmswebrtcendpointlib.so.6 \
+          /dist/usr/lib/x86_64-linux-gnu/libkmswebrtcendpointlib.so.6 \
      && cp /.kms/build/kms-elements/src/gst-plugins/webrtcendpoint/libwebrtcdataproto.so \
-           /dist/usr/lib/x86_64-linux-gnu/kurento/modules/libwebrtcdataproto.so.6 \
+           /dist/usr/lib/x86_64-linux-gnu/libwebrtcdataproto.so.6 \
      && cp /.kms/build/kms-core/src/gst-plugins/commons/sdpagent/libkmssdpagent.so \
-            /dist/usr/lib/x86_64-linux-gnu/kurento/modules/libkmssdpagent.so.6
+            /dist/usr/lib/x86_64-linux-gnu/libkmssdpagent.so.6 \
+     && cp /.kms/build/kms-elements/src/server/libkmselementsimpl.so \
+           /dist/usr/lib/x86_64-linux-gnu/libkmselementsimpl.so.6 \
+     && cp /.kms/kms-elements/src/server/config/WebRtcEndpoint.conf.ini \
+            /dist/etc/kurento/modules/kurento/WebRtcEndpoint.conf.ini \
+     && cp /.kms/build/kurento-media-server/server/kurento-media-server \
+           /dist/usr/bin/kurento-media-server
 
 
 
