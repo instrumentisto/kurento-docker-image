@@ -6,6 +6,15 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [6.12.0-r3]· 2019-10-23
+
+#### Build
+
+- Build kurento-media-server from [v6.12.0][5]
+
+
+
+
 ## [6.10.0-r3]· 2019-03-18
 
 #### Build
@@ -45,3 +54,4 @@ All user visible changes to this project will be documented in this file. This p
 [2]: https://github.com/instrumentisto/kms-elements
 [3]: http://releases.ubuntu.com/18.04/
 [4]: https://github.com/Kurento/kurento-media-server/releases/tag/6.10.0
+[5]: https://github.com/Kurento/kurento-media-server/releases/tag/6.12.0

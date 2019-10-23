@@ -9,7 +9,7 @@ package:
   libgstreamer1.5-0:amd64:
     installed: true
     versions:
-      - 1.8.1-1kurento1.18.04
+      - 1.8.1-1kurento2.18.04
   # gstreamer1.5-plugins-base installed
   gstreamer1.5-plugins-base:
     installed: true
@@ -24,7 +24,7 @@ package:
   gstreamer1.5-plugins-bad:amd64:
     installed: true
     versions:
-      - 1.8.1-1kurento2.18.04
+      - 1.8.1-1kurento4.18.04
   # gstreamer1.5-plugins-ugly installed
   gstreamer1.5-plugins-ugly:
     installed: true

@@ -23,76 +23,73 @@ RUN apt-get update \
   && apt-get install --no-install-recommends --yes \
     gnupg devscripts equivs
 
+WORKDIR /.kms
 
 # Download Kurento media server project sources
-RUN git clone https://github.com/Kurento/kms-omni-build.git  /.kms\
-  && cd /.kms/ \
-  && git checkout 8a743ec1f268c43d20e89e77619e4511109db527 \
+RUN git clone https://github.com/Kurento/kms-omni-build.git . \
+  && git checkout ee83e0f0ab62be8387e353c6e3d7914d5ecbc073
 
-  ## kms-elements fork
-  && git config -f .gitmodules submodule.kms-elements.url https://github.com/instrumentisto/kms-elements.git \
-  && git config -f .gitmodules submodule.kms-elements.branch master \
+## kms-elements fork
+RUN git config -f .gitmodules submodule.kms-elements.url https://github.com/instrumentisto/kms-elements.git \
+  && git submodule update --init --recursive
 
-  ## init
-  && git submodule update --init --recursive \
-
-  ## kms-cmake-utils
-  && cd kms-cmake-utils \
-  && git checkout 4078f77091dd2bdc7bcd404a7f5aed1b860b2fef \
+## kms-cmake-utils
+RUN cd kms-cmake-utils \
+  && git checkout 7ad36b5c5e84b02a3add398fc903cb6ae5d155f6 \
   && mk-build-deps --install --remove \
             --tool='apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes' \
             "debian/control" \
-  && cd .. \
+  && cd ..
 
-  ## kms-jsonrpc
-  && cd kms-jsonrpc \
-  && git checkout 0951b4749e319169e69068485772ce2789ef839f \
+## kms-jsonrpc
+RUN cd kms-jsonrpc \
+  && git checkout 870016e52b7abed8d45add7e192381f33f0f0b97 \
   && mk-build-deps --install --remove \
               --tool='apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes' \
               "debian/control" \
-  && cd .. \
+  && cd ..
 
-  ## kms-core
-  && cd kms-core \
-  && git checkout dcd7f64abf0e8f8c682ab7b379913c0d031a05bd \
+## kms-core
+RUN cd kms-core \
+  && git checkout 503ebf7eb9a5ee90afd88b459628e1957d574679 \
   && mk-build-deps --install --remove \
               --tool='apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes' \
               "debian/control" \
-  && cd .. \
+  && cd ..
 
-  ## kurento-module-creator
-  && cd kurento-module-creator \
-  && git checkout 5e78be8dbd56a32ab79bcfc1aeda3fa8effef4e6 \
+## kurento-module-creator
+RUN cd kurento-module-creator \
+  && git checkout 02841cad9f9344785921a6e5b07c863c9b8bd635 \
   && mk-build-deps --install --remove \
           --tool='apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes' \
           "debian/control" \
-  && cd .. \
+  && cd ..
 
-  ## kms-elements
-  && cd kms-elements \
-  && git checkout 65acb66cd7d6b7a30287b63330b5f66125435e69 \
+## kms-elements
+RUN cd kms-elements \
+  && git checkout 8dc58943c04f1155cd3ec6c1d348a0d5201a12c7 \
   && mk-build-deps --install --remove \
               --tool='apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes' \
               "debian/control" \
-  && cd .. \
+  && cd ..
 
-   ## kms-filters
-   && cd kms-filters \
-   && git checkout 76ed4efe05708ee3478c6a3b515cb9cfc4495854 \
+## kms-filters
+RUN cd kms-filters \
+   && git checkout 1e276c3361f00dca4d46ff7c6a98b2b889685e2e \
    && mk-build-deps --install --remove \
                --tool='apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes' \
                "debian/control" \
-   && cd .. \
+   && cd ..
 
-   ## kurento-media-server
-   && cd kurento-media-server \
-   && git checkout 8285e5c35d389be53c2246bd7d23a0da10cd59b4 \
+## kurento-media-server
+RUN cd kurento-media-server \
+   && git checkout 8c86fb72dbe638676aa32643b211c5117784ec1d \
    && mk-build-deps --install --remove \
                --tool='apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes' \
                "debian/control" \
-   && cd .. \
+   && cd ..
 
-   && mkdir -p /.kms/build/ \
+RUN mkdir -p /.kms/build/ \
    && cd /.kms/build/ \
    && cmake -DCMAKE_BUILD_TYPE=$TYPE \
             #  integration with these tools is not really finished
@@ -101,14 +98,14 @@ RUN git clone https://github.com/Kurento/kms-omni-build.git  /.kms\
             -DSANITIZE_THREAD=OFF \
             -DSANITIZE_LINK_STATIC=OFF \
              .. \
-    && make
+    && make -j$(nproc)
 
 RUN mkdir -p /dist/usr/lib/x86_64-linux-gnu/ \
      && mkdir -p /dist/etc/kurento/modules/kurento/ \
      && mkdir -p /dist/usr/bin/ \
      # Copy plugins
      && cp /.kms/build/kms-elements/src/server/libkmselementsmodule.so \
-           dist/usr/lib/x86_64-linux-gnu/libkmselementsmodule.so \
+           /dist/usr/lib/x86_64-linux-gnu/libkmselementsmodule.so \
      && cp /.kms/build/kms-elements/src/gst-plugins/webrtcendpoint/libwebrtcendpoint.so \
            /dist/usr/lib/x86_64-linux-gnu/libwebrtcendpoint.so \
      # Copy shared libs
@@ -135,7 +132,7 @@ FROM ubuntu:bionic AS Kurento
 ENV LANG=C.UTF-8 \
     DEBIAN_FRONTEND=noninteractive \
     UBUNTU_VERSION=bionic \
-    KMS_VERSION=6.10.0
+    KMS_VERSION=6.12.0
 
 # Configure environment for KMS
 # * Use default suggested logging levels:
